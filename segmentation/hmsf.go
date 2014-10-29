@@ -19,10 +19,10 @@ import (
  * is on the repo's README or to:
  * http://algo2.iti.kit.edu/wassenberg/wassenberg09parallelSegmentation.pdf
  */
-func (s *Segmenter) SegmentHMSF(minWeight float64) {
+func (s *Segmenter) SegmentHMSF(sigmaSmooth, minWeight float64) {
 	start := time.Now()
 	sigma := imagenoise.EstimateStdev(s.img)
-	s.smoothImage(0.8)
+	s.smoothImage(sigmaSmooth)
 	s.buildGraph()
 
 	fmt.Printf("segment... ")

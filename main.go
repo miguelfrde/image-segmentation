@@ -78,6 +78,12 @@ func segmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sigma, err := strconv.ParseFloat(r.FormValue("sigma"), 64)
+	if err != nil {
+		fmt.Fprintln(w, err)
+		return
+	}
+
 	graphType := graph.KINGSGRAPH
 	if r.FormValue("graph") == "2" {
 		graphType = graph.GRIDGRAPH
@@ -91,11 +97,6 @@ func segmentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if algorithm := r.FormValue("algorithm"); algorithm == "1" {
-		sigma, err := strconv.ParseFloat(r.FormValue("sigma"), 64)
-		if err != nil {
-			fmt.Fprintln(w, err)
-			return
-		}
 		k, err := strconv.ParseFloat(r.FormValue("k"), 64)
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -113,7 +114,7 @@ func segmentHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, err)
 			return
 		}
-		segmenter.SegmentHMSF(minWeight)
+		segmenter.SegmentHMSF(sigma, minWeight)
 	}
 
 	toimg, _ := os.Create("tmp/new_" + filename + ".png")

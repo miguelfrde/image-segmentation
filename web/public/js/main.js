@@ -8,6 +8,8 @@ function changeImage(activeImage, hiddenImage) {
 }
 
 $(function() {
+  $.material.init();
+
   var currentOriginal = '/img/original.jpg';
   var currentResult = '/img/result.png';
 
@@ -51,16 +53,6 @@ $(function() {
     }
   });
 
-  $('#initcredit-slider').noUiSlider({
-    start: 100,
-    step: 5,
-    connect: 'lower',
-    range: {
-      min: 1,
-      max: 1000
-    }
-  });
-
   $('#sigma-slider').Link('lower').to($('#input-sigma'));
 
   $('#k-slider').Link('lower').to($('#input-k'), null, {
@@ -74,11 +66,6 @@ $(function() {
   });
 
   $('#minweight-slider').Link('lower').to($('#input-minweight'), null, {
-    to: parseInt,
-    from: Number
-  });
-
-  $('#initcredit-slider').Link('lower').to($('#input-initcredit'), null, {
     to: parseInt,
     from: Number
   });
@@ -112,12 +99,12 @@ $(function() {
       processData: false,
       contentType: false,
       success: function(data) {
-        $('#btn-run').removeAttr('disabled');
-        $('#btn-run').text('Run');
-        $('#work-status').hide();
         data = data.split(' ');
         var filename = data[0];
         var originalext = data[1];
+        $('#btn-run').removeAttr('disabled');
+        $('#btn-run').text('Run');
+        $('#work-status').hide();
         current_original = filename + originalext;
         current_result  = 'new_' + filename + '.png';
         $('#original-image').attr('src', '/tmp/' + current_original);
