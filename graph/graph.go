@@ -117,19 +117,8 @@ func New(width, height int, graphType GraphType) *Graph {
 	for y := 0; y < g.height; y++ {
 		for x := 0; x < g.width; x++ {
 			p := x + y*g.width
-			if x+1 < width {
-				g.edges = append(g.edges, Edge{u: p, v: p + 1, weight: math.Inf(1)})
-			}
-			if y+1 < height {
-				g.edges = append(g.edges, Edge{u: p, v: p + g.width, weight: math.Inf(1)})
-			}
-			if graphType == KINGSGRAPH {
-				if y-1 >= 0 && x+1 < width {
-					g.edges = append(g.edges, Edge{u: p, v: p - g.width + 1, weight: math.Inf(1)})
-				}
-				if y+1 < height && x+1 < width {
-					g.edges = append(g.edges, Edge{u: p, v: p + g.width + 1, weight: math.Inf(1)})
-				}
+			for n := range g.Neighbors(p) {
+				g.edges = append(g.edges, Edge{u: p, v: n, weight: math.Inf(1)})
 			}
 		}
 	}
@@ -152,35 +141,41 @@ func FromImage(img image.Image, weight WeightFn, graphType GraphType) *Graph {
 		for x := 0; x < g.width; x++ {
 			p := x + y*g.width
 			pixel := Pixel{X: x, Y: y, Color: img.At(x, y)}
-
-			if x+1 < g.width {
-				pixel2 := Pixel{X: x + 1, Y: y, Color: img.At(x+1, y)}
+			for n := range g.Neighbors(p) {
+				x2, y2 := n%g.width, n/g.width
+				pixel2 := Pixel{X: x2, Y: x2, Color: img.At(x2, y2)}
 				w := weight(pixel, pixel2)
-				g.edges = append(g.edges, Edge{u: p, v: p + 1, weight: w})
-			}
-
-			if y+1 < g.height {
-				pixel2 := Pixel{X: x, Y: y + 1, Color: img.At(x, y+1)}
-				w := weight(pixel, pixel2)
-				g.edges = append(g.edges, Edge{u: p, v: p + g.width, weight: w})
-			}
-
-			if graphType == KINGSGRAPH {
-				if y-1 >= 0 && x+1 < g.width {
-					pixel2 := Pixel{X: x + 1, Y: y - 1, Color: img.At(x+1, y-1)}
-					w := weight(pixel, pixel2)
-					g.edges = append(g.edges, Edge{u: p, v: p - g.width + 1, weight: w})
-				}
-
-				if y+1 < g.height && x+1 < g.width {
-					pixel2 := Pixel{X: x + 1, Y: y + 1, Color: img.At(x+1, y+1)}
-					w := weight(pixel, pixel2)
-					g.edges = append(g.edges, Edge{u: p, v: p + g.width + 1, weight: w})
-				}
+				g.edges = append(g.edges, Edge{u: p, v: n, weight: w})
 			}
 		}
 	}
 	return g
+}
+
+/**
+ * Return the ids of the vertices to which v is adjacent
+ */
+func (g *Graph) Neighbors(v int) <-chan int {
+	ch := make(chan int)
+	go func() {
+		x, y := v%g.width, v/g.width
+		if x+1 < g.width {
+			ch <- v + 1
+		}
+		if y+1 < g.height {
+			ch <- v + g.width
+		}
+		if g.graphType == KINGSGRAPH {
+			if y-1 >= 0 && x+1 < g.width {
+				ch <- v - g.width + 1
+			}
+			if y+1 < g.height && x+1 < g.width {
+				ch <- v + g.width + 1
+			}
+		}
+		close(ch)
+	}()
+	return ch
 }
 
 /**
