@@ -1,0 +1,10 @@
+{
+    "name": "image-segmentation-mst",
+    "version": "0.0.1",
+    "dependencies": {
+        "bootstrap": "latest",
+        "bootstrap-material-design": "latest",
+        "nouislider": "latest"
+    },
+    "private": true
+}
