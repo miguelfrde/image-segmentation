@@ -5,6 +5,7 @@
 package graph
 
 import (
+	"github.com/miguelfrde/image-segmentation/utils"
 	"image"
 	"image/color"
 	"math"
@@ -101,6 +102,7 @@ type Graph struct {
 	edges         EdgeList
 	width, height int
 	graphType     GraphType
+	weights       [][]float64
 }
 
 /**
@@ -113,16 +115,34 @@ func New(width, height int, graphType GraphType) *Graph {
 	g.height = height
 	g.graphType = graphType
 	g.edges = make(EdgeList, 0, g.TotalEdges())
-
+	size := 4
+	if graphType == KINGSGRAPH {
+		size = 8
+	}
+	g.weights = make([][]float64, g.TotalVertices(), g.TotalVertices())
 	for y := 0; y < g.height; y++ {
 		for x := 0; x < g.width; x++ {
 			p := x + y*g.width
+			g.weights[p] = make([]float64, size/2, size/2)
 			for n := range g.Neighbors(p) {
 				g.edges = append(g.edges, Edge{u: p, v: n, weight: math.Inf(1)})
+				g.weights[p][g.weightIndex(p, n)] = math.Inf(1)
 			}
 		}
 	}
 	return g
+}
+
+func (g *Graph) weightIndex(from, to int) int {
+	if to == from+1 {
+		return 0
+	} else if to == from+g.width {
+		return 1
+	} else if to == from-g.width+1 {
+		return 2
+	} else {
+		return 3
+	}
 }
 
 /**
@@ -136,27 +156,41 @@ func FromImage(img image.Image, weight WeightFn, graphType GraphType) *Graph {
 	g.width = img.Bounds().Max.X
 	g.graphType = graphType
 	g.edges = make(EdgeList, 0, g.TotalEdges())
+	size := 4
+	if graphType == KINGSGRAPH {
+		size = 8
+	}
+	g.weights = make([][]float64, g.TotalVertices(), g.TotalVertices())
 
 	for y := 0; y < g.height; y++ {
 		for x := 0; x < g.width; x++ {
 			p := x + y*g.width
 			pixel := Pixel{X: x, Y: y, Color: img.At(x, y)}
+			g.weights[p] = make([]float64, size/2, size/2)
 			for n := range g.Neighbors(p) {
 				x2, y2 := n%g.width, n/g.width
 				pixel2 := Pixel{X: x2, Y: x2, Color: img.At(x2, y2)}
 				w := weight(pixel, pixel2)
 				g.edges = append(g.edges, Edge{u: p, v: n, weight: w})
+				g.weights[p][g.weightIndex(p, n)] = w
 			}
 		}
 	}
 	return g
 }
 
+func (g *Graph) Weight(u, v int) float64 {
+	if u == utils.MinI(u, v) || v == u-g.width+1 {
+		return g.weights[u][g.weightIndex(u, v)]
+	}
+	return g.weights[v][g.weightIndex(v, u)]
+}
+
 /**
  * Return the ids of the vertices to which v is adjacent
  */
 func (g *Graph) Neighbors(v int) <-chan int {
-	ch := make(chan int)
+	ch := make(chan int, 4)
 	go func() {
 		x, y := v%g.width, v/g.width
 		if x+1 < g.width {
