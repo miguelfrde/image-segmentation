@@ -5,7 +5,6 @@ import (
 	"github.com/miguelfrde/image-segmentation/utils"
 	"github.com/miguelfrde/imaging"
 	"image"
-	"image/color"
 	"math"
 	"runtime"
 	"time"
@@ -25,15 +24,6 @@ const (
 type indexValuePair struct {
 	i     int
 	value float64
-}
-
-/**
- * Returns the grayscale intensity of the color clr
- */
-func Intensity(clr color.Color) float64 {
-	r, g, b, _ := clr.RGBA()
-	r, g, b = r>>8, g>>8, b>>8
-	return 0.2126*float64(r) + 0.7152*float64(g) + 0.0722*float64(b)
 }
 
 /**
@@ -112,13 +102,13 @@ func computeStdevs(blocks []image.Image) (float64, []float64) {
 			total := float64((maxX - minX) * (maxY - minY))
 			for i := minX; i < maxX; i++ {
 				for j := minY; j < maxY; j++ {
-					mean += Intensity(block.At(i, j))
+					mean += utils.Intensity(block.At(i, j))
 				}
 			}
 			mean /= total
 			for i := minX; i < maxX; i++ {
 				for j := minY; j < maxY; j++ {
-					variance += math.Pow(Intensity(block.At(i, j))-mean, 2)
+					variance += math.Pow(utils.Intensity(block.At(i, j))-mean, 2)
 				}
 			}
 			ch <- indexValuePair{i: i, value: math.Sqrt(variance / total)}
@@ -182,8 +172,8 @@ func diffsAndMeanDiff(origBlocks, filtBlocks []image.Image) ([]float64, float64)
 		maxX, maxY := origBlocks[b].Bounds().Max.X, origBlocks[b].Bounds().Max.Y
 		for i := minX; i < maxX; i++ {
 			for j := minY; j < maxY; j++ {
-				intensityFiltered := Intensity(filtBlocks[b].At(i-minX, j-minY))
-				intensityOriginal := Intensity(origBlocks[b].At(i, j))
+				intensityFiltered := utils.Intensity(filtBlocks[b].At(i-minX, j-minY))
+				intensityOriginal := utils.Intensity(origBlocks[b].At(i, j))
 				diffs[b] = math.Abs(intensityFiltered - intensityOriginal)
 				mean += diffs[b] / total
 			}

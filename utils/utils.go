@@ -6,6 +6,7 @@
 package utils
 
 import (
+	"image/color"
 	"math"
 )
 
@@ -39,4 +40,13 @@ func Round(x float64) int {
 		return int(x + 1)
 	}
 	return int(x)
+}
+
+/**
+ * Returns the grayscale intensity of the color clr
+ */
+func Intensity(clr color.Color) float64 {
+	r, g, b, _ := clr.RGBA()
+	r, g, b = r>>8, g>>8, b>>8
+	return 0.2126*float64(r) + 0.7152*float64(g) + 0.0722*float64(b)
 }
