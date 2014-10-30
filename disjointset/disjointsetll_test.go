@@ -49,3 +49,24 @@ func TestComponentSizeLL(t *testing.T) {
 	assert.Equal(t, 1, set.Size(6))
 	assert.Equal(t, 1, set.Size(8))
 }
+
+func TestElementsINterator(t *testing.T) {
+	set := initSetLL()
+	var testElements func([]int)
+	testElements = func(vertices []int) {
+		for _, v := range vertices {
+			visited := make([]bool, 10, 10)
+			total := 0
+			for e := range set.Elements(v) {
+				assert.False(t, visited[e])
+				visited[e] = true
+				total++
+			}
+			assert.Equal(t, len(vertices), total)
+		}
+	}
+	testElements([]int{2, 5, 9, 7, 0})
+	testElements([]int{3, 4, 1})
+	testElements([]int{6})
+	testElements([]int{8})
+}
