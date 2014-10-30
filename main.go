@@ -23,8 +23,6 @@ const RANDOM_STR_SIZE = 25
 var templates = template.Must(template.ParseGlob("web/templates/*"))
 var letters = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789")
 
-/* Helper Functions */
-
 func randomString() string {
 	chars := make([]byte, RANDOM_STR_SIZE)
 	for i := range chars {
@@ -89,14 +87,20 @@ func segmentHandler(w http.ResponseWriter, r *http.Request) {
 		graphType = graph.GRIDGRAPH
 	}
 
+	weightfn := segmentation.NNWeight
+	if r.FormValue("weightfn") == "2" {
+		weightfn = segmentation.IntensityDifference
+	}
+
 	fmt.Println("Segmenting requested image:", header.Filename, "as", filename)
 	img := loadImageFromFile("tmp/" + filename + extension)
-	segmenter := segmentation.New(img, graphType, segmentation.NNWeight)
+	segmenter := segmentation.New(img, graphType, weightfn)
 	if r.FormValue("color") == "on" {
 		segmenter.SetRandomColors(true)
 	}
 
 	if algorithm := r.FormValue("algorithm"); algorithm == "1" {
+		fmt.Println("Using GBS")
 		k, err := strconv.ParseFloat(r.FormValue("k"), 64)
 		if err != nil {
 			fmt.Fprintln(w, err)
@@ -109,6 +113,7 @@ func segmentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		segmenter.SegmentGBS(sigma, k, int(minSize))
 	} else {
+		fmt.Println("Using HMSF")
 		minWeight, err := strconv.ParseFloat(r.FormValue("minweight"), 64)
 		if err != nil {
 			fmt.Fprintln(w, err)

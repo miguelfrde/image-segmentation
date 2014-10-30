@@ -1,4 +1,4 @@
-/*
+/**
  * Base structure
  */
 
@@ -11,11 +11,18 @@ body {
   text-align: center;
 }
 
-/*
+/**
+ * Navbar
+ */
+
+#github-link {
+  padding: 10px 15px 10px 10px !important;
+}
+
+/**
  * Sidebar
  */
 
-/* Hide for mobile, show later */
 .sidebar {
   position: fixed;
   top: 51px;
@@ -54,7 +61,11 @@ h2 {
   margin-left: -13px;
 }
 
-/*
+/**
+
+g:  padding: 10px 10px 10px 10px !important;;ithub-link {
+
+
  * Main content
  */
 

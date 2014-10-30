@@ -44,12 +44,12 @@ $(function() {
   });
 
   $('#minweight-slider').noUiSlider({
-    start: 10,
-    step: 1,
+    start: 5,
+    step: 0.05,
     connect: 'lower',
     range: {
       min: 0,
-      max: 50
+      max: 15
     }
   });
 
@@ -65,13 +65,10 @@ $(function() {
     from: Number
   });
 
-  $('#minweight-slider').Link('lower').to($('#input-minweight'), null, {
-    to: parseInt,
-    from: Number
-  });
+  $('#minweight-slider').Link('lower').to($('#input-minweight'));
 
-  $('#algorithm-select').change(function() {
-    if ($("#algorithm-select option:selected").val() == 1) {
+  $('input[name="algorithm"]:radio').change(function() {
+    if ($('input[name="algorithm"]:radio:checked').val() == 1) {
       $('#phsmf-params').hide();
       $('#gbs-params').show();
     } else {
