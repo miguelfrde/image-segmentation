@@ -52,5 +52,4 @@ $ go test ./...
 ## TODO
 
 - Implement the parallel version of the PHMSF algorithm
-
 - Implement more MST or non-graph based segmentation algorithms
