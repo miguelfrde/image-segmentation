@@ -73,7 +73,7 @@ func (s *Segmenter) gbsMergeSmallRegions(edges graph.EdgeList, minSize int) {
 	for _, edge := range edges {
 		u := s.resultset.Find(edge.U())
 		v := s.resultset.Find(edge.V())
-		if u != v && (s.resultset.Size(u) < minSize && s.resultset.Size(v) < minSize) {
+		if u != v && (s.resultset.Size(u) < minSize || s.resultset.Size(v) < minSize) {
 			s.resultset.Union(u, v)
 		}
 	}
