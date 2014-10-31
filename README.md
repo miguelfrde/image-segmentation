@@ -41,6 +41,7 @@ The `tmp` directory needs to be created since result images will be served from 
 $ PORT=8080 go run main.go
 ```
 
+Go to `localhost:5000` and try some images!
 
 ## Test
 
