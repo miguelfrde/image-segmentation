@@ -2,6 +2,10 @@
  * Base structure
  */
 
+html {
+  min-height: 100%;
+}
+
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
   padding-top: 50px;
@@ -95,4 +99,16 @@ g:  padding: 10px 10px 10px 10px !important;;ithub-link {
 
 .checkbox {
   margin-left: 21%;
+}
+
+footer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 40px;
+  width: 100%;
+}
+
+footer p {
+  margin: 10px;
 }
