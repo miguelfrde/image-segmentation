@@ -93,7 +93,7 @@ func (set *DisjointSetLL) Size(v int) int {
 	return set.regions[set.Find(v)].size
 }
 
-/**
+/*
  * Merge the regions that a and b belong to
  */
 func (set *DisjointSetLL) Union(a, b int) {
@@ -105,13 +105,18 @@ func (set *DisjointSetLL) Union(a, b int) {
 	set.totalComponents--
 	if region1.rank < region2.rank {
 		region2.head, region1.last.next = region1.head, region2.head
+		region2.last.next = region2.head
 		region2.size += region1.size
 		region1.parent = region2
 
 	} else {
 		region1.head, region2.last.next = region2.head, region1.head
+		region1.last.next = region1.head
 		region1.size += region2.size
 		region2.parent = region1
+		if region1.rank == region2.rank {
+			region1.rank++
+		}
 	}
 }
 
@@ -121,9 +126,10 @@ func (set *DisjointSetLL) Union(a, b int) {
 func (set *DisjointSetLL) Elements(v int) chan int {
 	ch := make(chan int)
 	go func() {
-		node := set.regions[set.Find(v)].head
+		region := set.Find(v)
+		node := set.regions[region].head
 		ch <- node.id
-		for node != node.next {
+		for set.regions[region].head != node.next {
 			ch <- node.next.id
 			node = node.next
 		}
@@ -150,7 +156,7 @@ func (set *DisjointSetLL) Print() {
 			for e := range set.Elements(region) {
 				fmt.Printf("%d -> ", e)
 			}
-			fmt.Printf("\n")
+			fmt.Printf("(%d)\n", set.regions[region].last.next.id)
 		}
 	}
 }
